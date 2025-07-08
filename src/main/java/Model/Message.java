@@ -18,6 +18,9 @@ public class Message {
         this.text = text;
     }
 
+    public Message() {
+    }
+
     public void setStatus(MessageStatus status) {
         this.status = status;
     }
@@ -48,5 +51,15 @@ public class Message {
 
     public User getSender() {
         return sender;
+    }
+
+    @Override
+    public String toString() {
+        return "Message{" +
+                "sender=" + sender.getNickName() +
+                ", text='" + text + '\'' +
+                ", deliveredTime=" + deliveredTime +
+                ", status=" + status +
+                "}\n";
     }
 }

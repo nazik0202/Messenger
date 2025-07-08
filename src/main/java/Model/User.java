@@ -24,6 +24,11 @@ public class User {
         this.nickName = nickName;
     }
 
+    public User() {
+    }
+
+
+
     public int getUserId() {
         return userId;
     }

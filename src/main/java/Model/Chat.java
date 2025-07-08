@@ -31,6 +31,7 @@ public class Chat {
     public Chat(int id, String name) {
         this.name = name;
         this.id = id;
+        this.messages = new ArrayList<>();
     }
 
     public void setMessages(List<Message> messages) {
@@ -55,5 +56,20 @@ public class Chat {
 
     public ChatType getType() {
         return type;
+    }
+
+    public void addMessage(Message message){
+        if(this.messages == null){
+            this.messages = new ArrayList<>();
+        }
+        messages.add(message);
+    }
+
+    public void setParticipants(List<User> participants) {
+        this.participants = participants;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 }

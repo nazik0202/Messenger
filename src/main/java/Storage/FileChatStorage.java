@@ -16,16 +16,21 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 public class FileChatStorage implements ChatStorage {
 
     private final String baseStoragePath;
     private final ObjectMapper objectMapper;
+
 
     public FileChatStorage(String baseStoragePath) {
         this.baseStoragePath = baseStoragePath;
         this.objectMapper = new ObjectMapper();
         this.objectMapper.enable(SerializationFeature.INDENT_OUTPUT); // Для красивого форматування JSON
         initializeStorageDirectory();
+
+        objectMapper.registerModule(new JavaTimeModule());
     }
 
     private void initializeStorageDirectory() {
@@ -44,7 +49,7 @@ public class FileChatStorage implements ChatStorage {
         return Paths.get(baseStoragePath, chat.getId() + ".json");
     }
 
-    private Chat loadChatFromFile(Path chatFilePath) {
+    public Chat loadChatFromFile(Path chatFilePath) {
         try {
             if (Files.exists(chatFilePath)) {
                 return objectMapper.readValue(chatFilePath.toFile(), Chat.class);

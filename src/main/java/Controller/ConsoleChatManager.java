@@ -4,12 +4,20 @@ package Controller;
 import Model.Chat;
 import Model.Message;
 import Model.User;
+import Storage.ChatStorage;
+import Storage.FileChatStorage;
 import util.MessageStatus;
 
 import java.time.LocalDateTime;
 import java.util.Scanner;
 
 public class ConsoleChatManager implements ChatManager{
+    ChatStorage storage;
+
+    public ConsoleChatManager(ChatStorage storage) {
+        this.storage = storage;
+    }
+
     @Override
     public Message writeMessage(User writer, Chat chat){
         Scanner sc = new Scanner(System.in);
@@ -26,7 +34,8 @@ public class ConsoleChatManager implements ChatManager{
         message.setStatus(MessageStatus.DELIVERED_CLIENT);
         message.setDeliveredTime(LocalDateTime.now());
         System.out.println("* \n delivered time:["+message.getDeliveredTime()+"]");
-
+        chat.addMessage(message);
+        storage.saveChat(chat);
 
     }
     @Override
