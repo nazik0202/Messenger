@@ -40,11 +40,17 @@ public class ConsoleChatManager implements ChatManager{
     }
     @Override
     public void editMessage(User editor, Chat chat,Message message, String newText){
+        if (editor.equals(message.getSender())){
+            message.setEdit(true);
+            message.setText(newText);
+            storage.saveChat(chat);
+        }
 
     }
     @Override
     public void deleteMessage(User user, Chat chat, Message message){
-
+        chat.deleteMessage(message);
+        storage.saveChat(chat);
     }
     @Override
     public void replyMessage(User replier, Message original, Chat chat, Message reply) {
@@ -56,7 +62,8 @@ public class ConsoleChatManager implements ChatManager{
     }
     @Override
     public void readMessage(Chat chat, Message message, User reader){
-
+        message.setStatus(MessageStatus.READ);
+        storage.saveChat(chat);
     }
 
 }

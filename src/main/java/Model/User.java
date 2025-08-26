@@ -4,6 +4,7 @@ import Storage.ProfilePhotoStorage;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 public class User {
     private int userId;
@@ -27,7 +28,17 @@ public class User {
     public User() {
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return userId == user.userId && onlineStatus == user.onlineStatus && Objects.equals(nickName, user.nickName) && Objects.equals(phoneNumber, user.phoneNumber) && Objects.equals(profileDescription, user.profileDescription) && Objects.equals(localTimezone, user.localTimezone) && Objects.equals(lastTimeOnline, user.lastTimeOnline) && Objects.equals(tags, user.tags) && Objects.equals(profilePhotoPath, user.profilePhotoPath) && Objects.equals(pps, user.pps) && Objects.equals(contactManager, user.contactManager);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId, nickName, phoneNumber, profileDescription, localTimezone, onlineStatus, lastTimeOnline, tags, profilePhotoPath, pps, contactManager);
+    }
 
     public int getUserId() {
         return userId;
@@ -71,5 +82,22 @@ public class User {
 
     public String getPhoneNumber() {
         return phoneNumber;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "userId=" + userId +
+                ", nickName='" + nickName + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", profileDescription='" + profileDescription + '\'' +
+                ", localTimezone='" + localTimezone + '\'' +
+                ", onlineStatus=" + onlineStatus +
+                ", lastTimeOnline=" + lastTimeOnline +
+                ", tags=" + tags +
+                ", profilePhotoPath='" + profilePhotoPath + '\'' +
+                ", pps=" + pps +
+                ", contactManager=" + contactManager +
+                '}';
     }
 }

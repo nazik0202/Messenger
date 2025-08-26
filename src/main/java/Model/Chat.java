@@ -72,4 +72,9 @@ public class Chat {
     public void setName(String name) {
         this.name = name;
     }
+
+    public void deleteMessage(Message message){
+        messages.remove(message);
+    }
+
 }
