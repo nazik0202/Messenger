@@ -1,9 +1,8 @@
 package Storage;
 
-import Model.Chat;
-import Model.Message;
+import Client.Model.Chat;
+import Client.Model.Message;
 import java.util.List;
-import java.util.Optional;
 
 public interface ChatStorage {
 

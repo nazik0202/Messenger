@@ -1,23 +1,12 @@
-import Controller.ConsoleChatManager;
-import Model.Chat;
-import Model.Message;
-import Model.User;
-import Security.ConsoleTest.SimpleServerSecurity;
-import Storage.FileChatStorage;
-
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import Server.Security.SQLITEDATABASE;
 
 //TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
 // click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
-        SimpleServerSecurity sss = new SimpleServerSecurity();
-        sss.generateKeys();
-        
+//        SimpleServerSecurity sss = new SimpleServerSecurity();
+//        sss.generateKeys();
+        SQLITEDATABASE sd = new SQLITEDATABASE();
         
         
         
