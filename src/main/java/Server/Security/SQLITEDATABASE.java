@@ -20,7 +20,7 @@ public class SQLITEDATABASE implements Database{
                 // Створюємо таблицю користувачів
                 stmt.execute("CREATE TABLE IF NOT EXISTS users (" +
                         "login TEXT PRIMARY KEY," +
-                        "password BLOB NOT NULL, publicKey BLOB NOT NULL)");
+                        "password BLOB NOT NULL, salt BLOB NOT NULL)");
                 System.out.println("Database is ready!");
             }
         } catch (SQLException e) {
@@ -31,7 +31,7 @@ public class SQLITEDATABASE implements Database{
 
     @Override
     public byte[] readPassword(String login) {
-        String sql = "SELECT publicKey FROM users WHERE login = ?";
+        String sql = "SELECT salt FROM users WHERE login = ?";
         try (Connection conn = DriverManager.getConnection(url);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -39,7 +39,7 @@ public class SQLITEDATABASE implements Database{
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-//                byte[] bytes = rs.getBytes("publicKey");
+//                byte[] bytes = rs.getBytes("salt");
                 return rs.getBytes("password");
             } else {
                 return null; // no such login
@@ -51,8 +51,8 @@ public class SQLITEDATABASE implements Database{
     }
 
     @Override
-    public PublicKey readPK(String login) {
-        String sql = "SELECT publicKey FROM users WHERE login = ?";
+    public byte[] readSL(String login) {
+        String sql = "SELECT salt FROM users WHERE login = ?";
         try (Connection conn = DriverManager.getConnection(url);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
@@ -60,15 +60,8 @@ public class SQLITEDATABASE implements Database{
             ResultSet rs = pstmt.executeQuery();
 
             if (rs.next()) {
-                byte[] bytes = rs.getBytes("publicKey");
-                try {
-                    X509EncodedKeySpec spec = new X509EncodedKeySpec(bytes);
-                    KeyFactory keyFactory = KeyFactory.getInstance("RRSA/ECB/PKCS1Padding");
-                    return keyFactory.generatePublic(spec);
-                } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-                    e.printStackTrace();
-                    return null;
-                }
+                return rs.getBytes("salt");
+
             } else {
                 return null; // no such login
             }
@@ -79,22 +72,36 @@ public class SQLITEDATABASE implements Database{
     }
 
     @Override
-    public void edit(byte[] data, byte[] newData) {
+    public void edit(String login, byte[] newData) {
 
     }
 
     @Override
-    public void edit(byte[] data, byte[] newData, byte[] publicKey) {
+    public void edit(String login, byte[] newData, byte[] publicKey) {
 
+    }
+
+
+    @Override
+    public void write(String login, byte[] password, byte[] salt) {
+        String sql = "INSERT INTO users(login,password,salt)" +
+                "VALUES(?,?,?)";
+        try (Connection conn = DriverManager.getConnection(url);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setString(1, login);
+            pstmt.setBytes(2, password);
+            pstmt.setBytes(3, salt);
+            pstmt.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException("Error reading from database", e);
+        }
     }
 
     @Override
-    public void write(byte[] data, byte password, byte[] publicKey) {
+    public void delete(String login) {
 
     }
 
-    @Override
-    public void delete(byte[] data) {
-
-    }
 }

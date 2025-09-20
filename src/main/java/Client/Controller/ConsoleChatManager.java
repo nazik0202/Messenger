@@ -4,7 +4,7 @@ package Client.Controller;
 import Client.Model.Chat;
 import Client.Model.Message;
 import Client.Model.User;
-import Storage.ChatStorage;
+import Server.Storage.ChatStorage;
 import Client.util.MessageStatus;
 
 import java.time.LocalDateTime;

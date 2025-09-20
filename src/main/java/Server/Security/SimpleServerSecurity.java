@@ -1,55 +1,56 @@
 package Server.Security;
 
-import Securit.ServerSecurity;
 
-import javax.crypto.Cipher;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
-import java.security.PublicKey;
 
-public class SimpleServerSecurity implements ServerSecurity {
+import Comon.Security.ServerConnection;
+
+import java.security.*;
+import java.util.Arrays;
+
+public class SimpleServerSecurity implements Server.Security.ServerSecurity {
+
+    private byte[] publicKey;
+
+    private ServerConnection connection;
+    private Database db;
+
+    public SimpleServerSecurity(ServerConnection connection, Database db){
+        this.connection = connection;
+        this.db = db;
+    }
+
+
     @Override
-    public KeyPair generateKeys() {
+    public byte[] generateSalt() {
         try {
-            KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
-            kpg.initialize(2048);
-            KeyPair kp = kpg.generateKeyPair();
-            return kp;
+            // generate random salt (16 bytes)
+            byte[] salt = new byte[16];
+            new SecureRandom().nextBytes(salt);
+
+            // store it для подальшого використання (якщо треба)
+            this.publicKey = salt; // замість this.publicKey
+
+            // повертаємо "public key" як байти (salt)
+            return salt;
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
-    public byte[] encrypt(byte[] data, PublicKey publicKey) {
-        try{
-            Cipher cipher = Cipher.getInstance("RSA");
-            cipher.init(Cipher.ENCRYPT_MODE, publicKey);
-            return cipher.doFinal(data);
-
-        }catch(Exception e){
-            throw new RuntimeException(e);
-        }
-
-
-
-    }
-
-    @Override
-    public byte[] decrypt(byte[] data, PrivateKey privateKey) {
-        try{
-            Cipher cipher = Cipher.getInstance("RSA");
-            cipher.init(Cipher.DECRYPT_MODE, privateKey);
-            return cipher.doFinal(data);
-
-        }catch(Exception e){
+    public byte[] encrypt(byte[] data, byte[] salt) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            digest.update(salt);          // додаємо соль
+            return digest.digest(data);   // хешуємо пароль + соль
+        } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
 
     @Override
     public boolean check(PrivateKey privateKeyServer, PublicKey publicKeyClient, byte[] encryptedTruePassword, byte[] encryptedTry) {
-        return encryptedTruePassword == encrypt(decrypt(encryptedTry,privateKeyServer),publicKeyClient);
+        return false;
     }
+
 }

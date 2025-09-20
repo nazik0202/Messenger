@@ -1,4 +1,4 @@
-package Storage;
+package Server.Storage;
 
 import Client.Model.Chat;
 import Client.Model.Message;

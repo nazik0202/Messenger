@@ -1,6 +1,6 @@
 package Client.Model;
 import Client.Controller.ContactManager;
-import Storage.ProfilePhotoStorage;
+import Server.Storage.ProfilePhotoStorage;
 
 import java.time.LocalDateTime;
 import java.util.List;

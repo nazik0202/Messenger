@@ -1,6 +1,4 @@
-package Client.Security.ConsoleTest;
-
-import Client.Security.ClientSecurity;
+package Client.Security;
 
 import javax.crypto.Cipher;
 import java.security.KeyPair;

@@ -4,9 +4,9 @@ import java.security.PublicKey;
 
 public interface Database {
     public byte[] readPassword(String login);
-    public PublicKey readPK(String login);
-    public void edit(byte[] data, byte[] newData);
-    public void edit(byte[] data, byte[] newData, byte[] publicKey);
-    public void write(byte[] data, byte password, byte[] publicKey);
-    public void delete(byte[] data);
+    public byte[] readSL(String login);
+    public void edit(String login, byte[] newData);
+    public void edit(String login, byte[] newData, byte[] salt);
+    public void write(String login, byte[] password, byte[] salt);
+    public void delete(String login);
 }

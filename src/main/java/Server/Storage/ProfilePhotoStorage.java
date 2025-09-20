@@ -1,4 +1,4 @@
-package Storage;
+package Server.Storage;
 
 import java.io.IOException;
 

@@ -1,6 +1,4 @@
-package Securit.ConsoleTest;
-
-import Coman.ServerConnection;
+package Comon.Security;
 
 import java.security.KeyFactory;
 import java.security.NoSuchAlgorithmException;
@@ -8,8 +6,9 @@ import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.X509EncodedKeySpec;
 
-class LocalServerConnection implements ServerConnection {
+public class LocalServerConnection implements ServerConnection {
     private byte[] buffer;
+    private boolean bool;
     @Override
     public void send(byte[] data) { this.buffer = data;}
 
@@ -20,9 +19,27 @@ class LocalServerConnection implements ServerConnection {
         this.buffer = data;
     }
 
+
+
+    @Override
+    public void send(boolean bool) {
+        this.bool = bool;
+    }
+
+    @Override
+    public void send(String str) {
+        this.buffer = str.getBytes();
+    }
+
     @Override
     public byte[] receive() { return buffer; }
+    @Override
     public String receiveStr() { return buffer.toString();}
+
+    @Override
+    public boolean reciveBool() {
+        return this.bool;
+    }
 
     @Override
     public PublicKey recivePublicKey() {
