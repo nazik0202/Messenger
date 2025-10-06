@@ -65,9 +65,11 @@ public class SQLITEDATABASE implements Database{
             } else {
                 return null; // no such login
             }
-
+        }catch (NullPointerException n){
+            return null;
         } catch (SQLException e) {
-            throw new RuntimeException("Error reading from database", e);
+            System.out.println("Error "+ e);
+            throw new RuntimeException("Error reading from database"+e, e);
         }
     }
 

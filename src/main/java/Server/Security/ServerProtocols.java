@@ -14,6 +14,7 @@ public class ServerProtocols implements Protocols {
         this.ss = new SimpleServerSecurity(sc,db);
     }
 
+
     @Override
     public boolean authentication() {
         return false;
@@ -33,22 +34,24 @@ public class ServerProtocols implements Protocols {
     public boolean registration() {
 //          1. клієнт викликає протокол регестраці
         String login = "";
-        boolean loginInvalid = true;
-        while (loginInvalid) {
-
+        boolean loginValid = false;
+        String temp = sc.receiveStr();
+        while (!loginValid) {
+            System.out.println("server is waiting for login");
 
 //          2. клієнт вводить логін та відправляє серверу
             login = sc.receiveStr();
+            System.out.println("server received login:"+login);
 //          3. сервер перевіряє чи нема що нема в бд запису с таким логіном
             byte[] answ = db.readSL(login);
 
 //          4. сервер передає відповідь
             if(answ == null){
-                loginInvalid = false;
-
+                loginValid = true;
+                System.out.println("login is valid");
             }
 //          5. якщо є то клієнт переносится на крок 2 та видоми повідомлення
-            sc.send(!loginInvalid);
+            sc.send(loginValid);
         }
 
 //          6. сервер генерує та відправляє сіль
@@ -59,7 +62,7 @@ public class ServerProtocols implements Protocols {
 //          8.сервер зберігає: логін, пароль, сіль
         db.write(login,password,salt);
 //
-        return false;
+        return true;
     }
 
 }

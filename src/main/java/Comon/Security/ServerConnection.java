@@ -1,5 +1,6 @@
 package Comon.Security;
 
+import java.net.http.WebSocket;
 import java.security.PublicKey;
 
 public interface ServerConnection {

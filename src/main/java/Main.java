@@ -6,10 +6,10 @@ public class Main {
     public static void main(String[] args) {
 //        SimpleServerSecurity sss = new SimpleServerSecurity();
 //        sss.generateKeys();
-        SQLITEDATABASE sd = new SQLITEDATABASE();
-        
-        
-        
+        //SQLITEDATABASE sd = new SQLITEDATABASE();
+        System.out.println("hi");
+
+
 //
 
 //        User coolUser0 = new User(0,"coolUser0");

@@ -1,9 +1,7 @@
 package Client.Security;
 
-import Comon.Security.LocalServerConnection;
 import Comon.Security.Protocols;
 import Comon.Security.ServerConnection;
-import Server.Security.ServerProtocols;
 
 import java.util.Scanner;
 
@@ -12,9 +10,9 @@ public class ClientProtocols implements Protocols {
     ClientSecurity cs;
     Scanner scanner;
 
-    public ClientProtocols() {
-        this.cs = new SimpleClientSecurity();
-        this.sc = new LocalServerConnection();
+    public ClientProtocols(WebSocketClientConnection connection, ClientSecurity simpleClientSecurity) {
+        this.cs = simpleClientSecurity;
+        this.sc = connection;
         this.scanner = new Scanner(System.in);
     }
 
@@ -37,8 +35,7 @@ public class ClientProtocols implements Protocols {
     public boolean registration() {
         boolean loginValid = false;
 //          1. клієнт викликає протокол регестрації
-        ServerProtocols sp = new ServerProtocols(sc);
-        sp.registration();
+        sc.send("registration");
         while (!loginValid) {
 //          2. клієнт вводить логін та відправляє серверу
             String login = scanner.nextLine();
@@ -51,7 +48,7 @@ public class ClientProtocols implements Protocols {
 //          6. сервер генерує та відправляє сіль
         byte[] salt = sc.receive();
 //          7. клієнт придумує пароль, шифрує і відправляє на сервер
-        byte[] password = null;// я  не знаю як зашифрувати
+        byte[] password = cs.encrypt(salt,scanner.nextLine());
         sc.send(password);
 //          8.сервер зберігає: логін, пароль, сіль
 
