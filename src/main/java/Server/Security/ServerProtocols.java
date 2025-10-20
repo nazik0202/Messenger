@@ -3,6 +3,8 @@ package Server.Security;
 import Comon.Security.Protocols;
 import Comon.Security.ServerConnection;
 
+import java.util.Base64;
+
 public class ServerProtocols implements Protocols {
     ServerConnection sc;
     Database db;
@@ -59,6 +61,7 @@ public class ServerProtocols implements Protocols {
         sc.send(salt);
 //          7. клієнт придумує пароль, шифрує і відправляє на сервер
         byte[] password = sc.receive();
+
 //          8.сервер зберігає: логін, пароль, сіль
         db.write(login,password,salt);
 //

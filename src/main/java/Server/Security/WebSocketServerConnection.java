@@ -4,6 +4,7 @@ import Comon.Security.ServerConnection;
 import org.java_websocket.WebSocket;
 
 import java.security.PublicKey;
+import java.util.Base64;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -18,11 +19,16 @@ public class WebSocketServerConnection implements ServerConnection {
 
     // Викликається серверним WebSocketServer при отриманні повідомлення
     public void onMessage(String message) {
-        incoming.offer(message);}
+        System.out.println("new message: "+message);
+        incoming.offer(message);
+        System.out.println(incoming);
+    }
 
     @Override
     public void send(byte[] data) {
-        socket.send(data);
+        String base64 = Base64.getEncoder().encodeToString(data);
+        socket.send(base64);
+
     }
 
     @Override
@@ -46,8 +52,7 @@ public class WebSocketServerConnection implements ServerConnection {
         try {
             // Забираємо наступний рядок і перетворюємо в байти
             String msg = incoming.take();
-            incoming.clear(); // очищаємо, щоб старі повідомлення не залишались
-            return msg.getBytes();
+            return Base64.getDecoder().decode(msg);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
@@ -56,9 +61,17 @@ public class WebSocketServerConnection implements ServerConnection {
     @Override
     public String receiveStr() {
         try {
-            String msg = incoming.take();
-            incoming.clear();// очищаємо після прочитання
-            System.out.println(msg+" received");
+            String msg = "";
+            for (int i = 0;i<30000;i++) {
+                msg = incoming.take();
+                if(msg != ""){
+                    break;
+                }
+                else {
+                    wait(100);
+                    System.out.println(i);
+                }
+            }
             return msg;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);

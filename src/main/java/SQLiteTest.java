@@ -2,19 +2,17 @@ import java.sql.*;
 
 public class SQLiteTest {
     public static void main(String[] args) {
-        String url = "jdbc:sqlite:accounts.db"; // файл у робочій директорії
+        String url = "jdbc:sqlite:src/main/java/Server/DataBase/accounts.db"; // файл у робочій директорії
 
-        try (Connection conn = DriverManager.getConnection(url)) {
-            if (conn != null) {
-                Statement stmt = conn.createStatement();
-                // Створюємо таблицю користувачів
-                stmt.execute("CREATE TABLE IF NOT EXISTS users (" +
-                        "username TEXT PRIMARY KEY," +
-                        "password BLOB NOT NULL)");
-                System.out.println("Database is ready!");
+        String sql = "SELECT * FROM users WHERE login='nazik'";
+        try (Connection conn = DriverManager.getConnection(url);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            ResultSet rs = pstmt.executeQuery();
+            for(int i=1; i<4; i++) {
+                System.out.println(rs.getString(i));
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            throw new RuntimeException("Error reading from database", e);
         }
     }
 }

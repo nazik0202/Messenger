@@ -6,6 +6,7 @@ import org.java_websocket.handshake.ServerHandshake;
 
 import java.net.URI;
 import java.security.PublicKey;
+import java.util.Base64;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -40,7 +41,9 @@ public class WebSocketClientConnection extends WebSocketClient implements Server
     // ===== Implementation of ServerConnection =====
     @Override
     public void send(byte[] data) {
-        super.send(data);
+        String base64 = Base64.getEncoder().encodeToString(data);
+        super.send(base64);
+
     }
 
     @Override
@@ -64,7 +67,6 @@ public class WebSocketClientConnection extends WebSocketClient implements Server
         try {
             // Забираємо наступний рядок і перетворюємо в байти
             String msg = incoming.take();
-            incoming.clear(); // очищаємо, щоб старі повідомлення не залишались
             return msg.getBytes();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
@@ -75,7 +77,6 @@ public class WebSocketClientConnection extends WebSocketClient implements Server
     public String receiveStr() {
         try {
             String msg = incoming.take();
-            incoming.clear(); // очищаємо після прочитання
             return msg;
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
