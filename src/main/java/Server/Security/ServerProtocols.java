@@ -19,7 +19,24 @@ public class ServerProtocols implements Protocols {
 
     @Override
     public boolean authentication() {
-        return false;
+        /*
+        1.клієнт визиває протокол аунтефікації
+        2.сервер запускаєаунтефікацію
+        3.клієнт вводить логін
+        4.сервер шукає цей логін та якщо є то відправяє сіль
+        5.клієнт вводить пароль та шифрує і відправляє на сервер
+        6.сервер перевіряє пароль та якщо првалильно то впускає користуувача
+         */
+        String temp = sc.receiveStr();
+        System.out.println("server is waiting for login");
+        String login = sc.receiveStr();
+        sc.send(db.readSL(login));
+        System.out.println("server is waiting for pasword");
+        byte[] password = sc.receive();
+        boolean auth = password == db.readPassword(login);
+        sc.send(auth);
+        System.out.println(auth);
+        return auth;
     }
 
     @Override

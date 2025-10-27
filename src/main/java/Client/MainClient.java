@@ -14,6 +14,8 @@ public class MainClient {
 
         ClientProtocols protocols = new ClientProtocols(connection, new ClientSecurity());
         protocols.registration();
-        // TODO: authentication
+        protocols.authentication();
+        System.out.println("end of auth");
+
     }
 }

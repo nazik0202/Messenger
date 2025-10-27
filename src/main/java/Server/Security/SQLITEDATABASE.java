@@ -31,7 +31,7 @@ public class SQLITEDATABASE implements Database{
 
     @Override
     public byte[] readPassword(String login) {
-        String sql = "SELECT salt FROM users WHERE login = ?";
+        String sql = "SELECT password FROM users WHERE login = ?";
         try (Connection conn = DriverManager.getConnection(url);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 

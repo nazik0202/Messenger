@@ -18,7 +18,16 @@ public class ClientProtocols implements Protocols {
 
     @Override
     public boolean authentication() {
-        return false;
+        boolean auth = false;
+        sc.send("authentication");
+
+        String login = scanner.nextLine();
+        sc.send(login);
+        byte[] salt = sc.receive();
+        sc.send(cs.encrypt(salt,scanner.nextLine()));
+        auth = sc.reciveBool();
+        System.out.println(auth);
+        return auth;
     }
 
     @Override
