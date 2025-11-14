@@ -97,7 +97,7 @@ public class SQLITEDATABASE implements Database{
             pstmt.executeUpdate();
 
         } catch (SQLException e) {
-            throw new RuntimeException("Error reading from database", e);
+            throw new RuntimeException(e);
         }
     }
 

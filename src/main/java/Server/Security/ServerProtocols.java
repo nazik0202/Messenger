@@ -2,6 +2,7 @@ package Server.Security;
 
 import Comon.Security.Protocols;
 import Comon.Security.ServerConnection;
+import org.sqlite.SQLiteException;
 
 import java.util.Base64;
 
@@ -33,7 +34,10 @@ public class ServerProtocols implements Protocols {
         sc.send(db.readSL(login));
         System.out.println("server is waiting for pasword");
         byte[] password = sc.receive();
-        boolean auth = password == db.readPassword(login);
+        byte[] pfdb = db.readPassword(login);
+        String passwordS =  Base64.getEncoder().encodeToString(password);
+        String pfdbS =  Base64.getEncoder().encodeToString(pfdb);
+        boolean auth = passwordS.equals(pfdbS);
         sc.send(auth);
         System.out.println(auth);
         return auth;
@@ -78,9 +82,13 @@ public class ServerProtocols implements Protocols {
         sc.send(salt);
 //          7. клієнт придумує пароль, шифрує і відправляє на сервер
         byte[] password = sc.receive();
-
-//          8.сервер зберігає: логін, пароль, сіль
-        db.write(login,password,salt);
+        try {
+            db.write(login,password,salt);
+        }catch (RuntimeException e){
+            sc.send(false);
+            return false;
+        }
+        sc.send(true);
 //
         return true;
     }

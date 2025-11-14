@@ -26,7 +26,6 @@ public class ClientProtocols implements Protocols {
         byte[] salt = sc.receive();
         sc.send(cs.encrypt(salt,scanner.nextLine()));
         auth = sc.reciveBool();
-        System.out.println(auth);
         return auth;
     }
 
@@ -60,7 +59,8 @@ public class ClientProtocols implements Protocols {
         byte[] password = cs.encrypt(salt,scanner.nextLine());
         sc.send(password);
 //          8.сервер зберігає: логін, пароль, сіль
+        boolean reg = sc.reciveBool();
 
-        return false;
+        return reg;
     }
 }

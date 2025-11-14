@@ -14,6 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class MainServer extends WebSocketServer {
     private final Map<WebSocket, WebSocketServerConnection> connections = new ConcurrentHashMap<>();
     public static void main(String[] args){
+
         MainServer server = new MainServer(8080);
         server.start();
     }
