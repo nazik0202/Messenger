@@ -7,11 +7,11 @@ import org.sqlite.SQLiteException;
 import java.util.Base64;
 
 public class ServerProtocols implements Protocols {
-    ServerConnection sc;
+    WebSocketServerConnection sc;
     Database db;
     ServerSecurity ss;
 
-    public ServerProtocols(ServerConnection sc) {
+    public ServerProtocols(WebSocketServerConnection sc) {
         this.sc = sc;
         this.db = new SQLITEDATABASE();
         this.ss = new SimpleServerSecurity(sc,db);
@@ -40,6 +40,9 @@ public class ServerProtocols implements Protocols {
         boolean auth = passwordS.equals(pfdbS);
         sc.send(auth);
         System.out.println(auth);
+        if(auth){
+            sc.setAuthenticated(1);//TODO get user id from db
+        }
         return auth;
     }
 

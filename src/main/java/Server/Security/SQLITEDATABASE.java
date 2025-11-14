@@ -20,7 +20,9 @@ public class SQLITEDATABASE implements Database{
                 // Створюємо таблицю користувачів
                 stmt.execute("CREATE TABLE IF NOT EXISTS users (" +
                         "login TEXT PRIMARY KEY," +
-                        "password BLOB NOT NULL, salt BLOB NOT NULL)");
+                        "password BLOB NOT NULL," +
+                        " salt BLOB NOT NULL," +
+                        "userID UINT NOT NULL UNIQUE AUTOINCREMENT)");//TODO forein key
                 System.out.println("Database is ready!");
             }
         } catch (SQLException e) {
@@ -87,13 +89,14 @@ public class SQLITEDATABASE implements Database{
     @Override
     public void write(String login, byte[] password, byte[] salt) {
         String sql = "INSERT INTO users(login,password,salt)" +
-                "VALUES(?,?,?)";
+                "VALUES(?,?,?,?)";
         try (Connection conn = DriverManager.getConnection(url);
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
 
             pstmt.setString(1, login);
             pstmt.setBytes(2, password);
             pstmt.setBytes(3, salt);
+//            pstmt.setBytes(4, userID);
             pstmt.executeUpdate();
 
         } catch (SQLException e) {

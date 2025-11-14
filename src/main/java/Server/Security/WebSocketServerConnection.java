@@ -12,10 +12,26 @@ public class WebSocketServerConnection implements ServerConnection {
 
     private final WebSocket socket;
     private final BlockingQueue<String> incoming = new LinkedBlockingQueue<>();
+    private volatile boolean isAuthenticated = false;
+    private volatile int userId = -1;
 
     public WebSocketServerConnection(WebSocket socket) {
         this.socket = socket;
     }
+
+    public boolean isAuthenticated() {
+        return isAuthenticated;
+    }
+
+    public int getUserId() {
+        return userId;
+    }
+    public void setAuthenticated(int userId) {
+        this.userId = userId;
+        this.isAuthenticated = true;
+        incoming.clear();
+    }
+
 
     // Викликається серверним WebSocketServer при отриманні повідомлення
     public void onMessage(String message) {
