@@ -1,8 +1,7 @@
 package Server;
 
-import Server.Security.SQLITEDATABASE;
 import Server.Security.ServerProtocols;
-import Server.Security.WebSocketServerConnection;
+import Server.Connection.WebSocketServerConnection;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;

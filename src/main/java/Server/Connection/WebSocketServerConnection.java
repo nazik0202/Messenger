@@ -1,4 +1,4 @@
-package Server.Security;
+package Server.Connection;
 
 import Comon.Security.ServerConnection;
 import org.java_websocket.WebSocket;

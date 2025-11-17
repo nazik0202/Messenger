@@ -3,9 +3,9 @@ package Server.Security;
 
 
 import Comon.Security.ServerConnection;
+import Server.DataBase.Classes.Database;
 
 import java.security.*;
-import java.util.Arrays;
 
 public class SimpleServerSecurity implements Server.Security.ServerSecurity {
 

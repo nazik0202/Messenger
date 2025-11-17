@@ -1,19 +1,20 @@
 package Server.Security;
 
 import Comon.Security.Protocols;
-import Comon.Security.ServerConnection;
-import org.sqlite.SQLiteException;
+import Server.Connection.WebSocketServerConnection;
+import Server.DataBase.Classes.AutorizationDB;
+import Server.DataBase.Classes.Database;
 
 import java.util.Base64;
 
 public class ServerProtocols implements Protocols {
     WebSocketServerConnection sc;
-    Database db;
+    AutorizationDB db;
     ServerSecurity ss;
 
     public ServerProtocols(WebSocketServerConnection sc) {
         this.sc = sc;
-        this.db = new SQLITEDATABASE();
+        this.db = new AutorizationDB();
         this.ss = new SimpleServerSecurity(sc,db);
     }
 
@@ -86,7 +87,7 @@ public class ServerProtocols implements Protocols {
 //          7. клієнт придумує пароль, шифрує і відправляє на сервер
         byte[] password = sc.receive();
         try {
-            db.write(login,password,salt);
+            db.writeUser(login,password,salt);
         }catch (RuntimeException e){
             sc.send(false);
             return false;
