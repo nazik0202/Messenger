@@ -23,7 +23,15 @@ public class DatabaseSchema {
                         new Column("id", "INTEGER PRIMARY KEY AUTOINCREMENT"),
                         new Column("login", "TEXT UNIQUE NOT NULL"),
                         new Column("password", "BLOB NOT NULL"),
-                        new Column("salt", "BLOB NOT NULL")
+                        new Column("salt", "BLOB NOT NULL"),
+                        new Column("nickName","TEXT"),
+                        new Column("phoneNum","TEXT"),
+                        new Column("description","TEXT"),
+                        new Column("localTimezone","TEXT"),
+                        new Column("lastTimeOnline","DATETIME")
+
+
+
                 ),
                 List.of(), // PK вже визначено в Column
                 List.of()

@@ -4,8 +4,13 @@ import Comon.Security.Protocols;
 import Server.Connection.WebSocketServerConnection;
 import Server.DataBase.Classes.AutorizationDB;
 import Server.DataBase.Classes.Database;
+import com.fasterxml.jackson.databind.ext.SqlBlobSerializer;
 
+import java.lang.reflect.Array;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 
 public class ServerProtocols implements Protocols {
     WebSocketServerConnection sc;
@@ -41,8 +46,15 @@ public class ServerProtocols implements Protocols {
         boolean auth = passwordS.equals(pfdbS);
         sc.send(auth);
         System.out.println(auth);
-        if(auth){
-            sc.setAuthenticated(1);//TODO get user id from db
+        if(auth) {
+            int id;
+            try {
+                id = (int) db.read("users", List.of("id"), List.of("login"), List.of(login)).get(0).get("id");
+                sc.setAuthenticated(id);
+            }
+            catch (SQLException e){
+                System.out.println(e);
+            }
         }
         return auth;
     }
