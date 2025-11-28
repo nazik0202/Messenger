@@ -14,9 +14,13 @@ public class WebSocketServerConnection implements ServerConnection {
     private final BlockingQueue<String> incoming = new LinkedBlockingQueue<>();
     private volatile boolean isAuthenticated = false;
     private volatile int userId = -1;
+    private final AsyncChatHandler chatHandler;
+
 
     public WebSocketServerConnection(WebSocket socket) {
         this.socket = socket;
+        this.chatHandler = new AsyncChatHandler();
+
     }
 
     public boolean isAuthenticated() {
@@ -35,9 +39,15 @@ public class WebSocketServerConnection implements ServerConnection {
 
     // Викликається серверним WebSocketServer при отриманні повідомлення
     public void onMessage(String message) {
-        System.out.println("new message: "+message);
-        incoming.offer(message);
-        System.out.println(incoming);
+        if (isAuthenticated) {
+            System.out.println("Async msg from user " + userId + ": " + message);
+            chatHandler.handle(message, this);
+        }
+        else {
+            System.out.println("new message: " + message);
+            incoming.offer(message);
+            System.out.println(incoming);
+        }
     }
 
     @Override

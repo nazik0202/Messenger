@@ -8,12 +8,16 @@ import java.util.Map;
 public class ChatDB extends SQLiteDataBase {
 
     public ChatDB() {
-        super(DatabaseSchema.Table.CHATS); // Ensures tables exist
+        super(DatabaseSchema.Table.CHATS);
+
+        SQLiteDataBase sqlDBcu = new SQLiteDataBase(DatabaseSchema.Table.CHAT_USERS);// Ensures tables exist
+        SQLiteDataBase sqlDBm = new SQLiteDataBase(DatabaseSchema.Table.MESSAGES);
     }
 
     // Create a private chat between two users
     public long createPrivateChat(int userId1, int userId2) {
         try {
+            System.out.println("Create private chat");
             // 1. Create chat entry
             long chatId = write(DatabaseSchema.Table.CHATS.getTableName(),
                     List.of("is_group_chat"),
@@ -66,6 +70,7 @@ public class ChatDB extends SQLiteDataBase {
                     List.of("login"),
                     List.of(login));
             if (res.isEmpty()) return -1;
+            System.out.println("userId:"+(Integer) res.get(0).get("id"));
             return (Integer) res.get(0).get("id");
         } catch (SQLException e) {
             return -1;
