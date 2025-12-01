@@ -3,7 +3,7 @@ public class Main {
 
         byte[] arr1a = {10, 20, 30};
         byte[] arr1b = arr1a;
-        System.out.println("arr1a == arr1b: " + (arr1a == arr1b));//
+        System.out.println("arr1a == arr1b: " + (arr1a == arr1b));
 
         byte[] arr2a = {10, 20, 30};
         byte[] arr2b = {10, 20, 30};
