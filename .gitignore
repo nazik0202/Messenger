@@ -30,3 +30,4 @@ bin/
 .DS_Store
 
 accounts.db
+/src/main/java/Server/DataBase/Data/messenger.db

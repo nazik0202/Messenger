@@ -1,5 +1,5 @@
 package Client.util;
 
 public enum ChatType {
-    CHAT, GROUP, CHANEL
+    PRIVATE, GROUP, CHANEL
 }

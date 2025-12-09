@@ -1,6 +1,9 @@
 package Server.DataBase.Classes;
 
-import java.sql.SQLException;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -76,4 +79,44 @@ public class ChatDB extends SQLiteDataBase {
             return -1;
         }
     }
+    public JSONArray getUserChatsWithDetails(int userId) {
+        String sql = """
+            SELECT c.id, c.is_group_chat, c.chat_name, u.login as other_user_login
+            FROM chats c
+            JOIN chat_users cu_me ON c.id = cu_me.chat_id
+            LEFT JOIN chat_users cu_other ON c.id = cu_other.chat_id AND cu_other.user_id != ?
+            LEFT JOIN users u ON cu_other.user_id = u.id
+            WHERE cu_me.user_id = ?
+        """;
+
+        JSONArray chats = new JSONArray();
+        try (Connection conn = DriverManager.getConnection(url);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, userId);
+            pstmt.setInt(2, userId);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                JSONObject chat = new JSONObject();
+                chat.put("id", rs.getInt("id"));
+                boolean isGroup = rs.getBoolean("is_group_chat");
+
+                // Логіка відображення назви
+                if (isGroup) {
+                    chat.put("name", rs.getString("chat_name"));
+                    chat.put("type", "group");
+                } else {
+                    String otherLogin = rs.getString("other_user_login");
+                    chat.put("name", otherLogin != null ? otherLogin : "Unknown User");
+                    chat.put("type", "private");
+                }
+                chats.put(chat);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return chats;
+    }
+
 }

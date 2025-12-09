@@ -6,8 +6,8 @@ import Client.Security.WebSocketClientConnection;
 
 import java.net.URI;
 import java.util.Base64;
-import java.util.Scanner;//login:elorig password:7162
-                         //login:asd password:1
+import java.util.Scanner;//login:qwe password:1
+                         //login:asd password:2
 
 
 public class MainClient {

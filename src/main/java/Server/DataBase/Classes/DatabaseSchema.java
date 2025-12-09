@@ -72,9 +72,12 @@ public class DatabaseSchema {
                         new Column("chat_id", "INTEGER NOT NULL"),
                         new Column("sender_id", "INTEGER NOT NULL"),
                         new Column("content", "BLOB NOT NULL"),
-                        new Column("timestamp", "DATETIME DEFAULT CURRENT_TIMESTAMP"),
-                        new Column("status", "TEXT DEFAULT 'sent'")
-                ),
+                        new Column("send_time", "DATETIME DEFAULT CURRENT_TIMESTAMP"),
+                        new Column("deliver_time", "DATETIME"),
+                        new Column("status", "TEXT DEFAULT 'sent'"),
+                        new Column("edit","BOOL DEFAULT 0"),
+                        new Column("num_in_chat", "INTEGER")
+                        ),
                 List.of(),
                 List.of(
                         new ForeignKey("chat_id", "chats", "id"),
