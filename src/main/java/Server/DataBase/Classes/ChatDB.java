@@ -118,5 +118,45 @@ public class ChatDB extends SQLiteDataBase {
         }
         return chats;
     }
+    public JSONArray getChatHistory(int chatId, int limit, int offset) {
+        String sql = """
+            SELECT m.id, m.content, m.send_time, m.status, m.sender_id, u.login
+            FROM messages m
+            JOIN users u ON m.sender_id = u.id
+            WHERE m.chat_id = ?
+            ORDER BY m.send_time DESC
+            LIMIT ? OFFSET ?
+        """;
+
+        JSONArray messages = new JSONArray();
+        try (Connection conn = DriverManager.getConnection(url);
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+
+            pstmt.setInt(1, chatId);
+            pstmt.setInt(2, limit);
+            pstmt.setInt(3, offset);
+            ResultSet rs = pstmt.executeQuery();
+
+            while (rs.next()) {
+                JSONObject msg = new JSONObject();
+                msg.put("id", rs.getInt("id"));
+                msg.put("sender", rs.getString("login"));
+                msg.put("sender_id", rs.getInt("sender_id"));
+                // Контент в базі BLOB, але ми зберігали Base64 стрінгу як байти, тому просто читаємо
+                msg.put("content", new String(rs.getBytes("content")));
+                msg.put("timestamp", rs.getString("send_time"));
+                msg.put("status", rs.getString("status"));
+                messages.put(msg);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        // Реверс, щоб на клієнті показувати хронологічно (знизу нові)
+        JSONArray reversed = new JSONArray();
+        for (int i = messages.length() - 1; i >= 0; i--) {
+            reversed.put(messages.get(i));
+        }
+        return reversed;
+    }
 
 }
