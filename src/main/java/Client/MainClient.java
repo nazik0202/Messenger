@@ -1,12 +1,14 @@
 package Client;
 
 import Client.Controller.NetworkChatManager;
+import Client.Gui.GuiClient;
 import Client.Model.Chat;
 import Client.Model.Message;
 import Client.Model.User;
 import Client.Security.ClientProtocols;
 import Client.Security.ClientSecurity;
 import Client.Security.WebSocketClientConnection;
+import javafx.application.Application;
 
 import java.net.URI;
 import java.util.Base64;
@@ -64,34 +66,9 @@ public class MainClient {
 //        }
 //    }
 
-    public static void main(String[] args) throws Exception {
-        WebSocketClientConnection connection = new WebSocketClientConnection(new URI("ws://localhost:8080"));
-        connection.connectBlocking(); // підключення до сервера
-        Scanner sc = new Scanner(System.in);
-        ClientProtocols protocols = new ClientProtocols(connection, new ClientSecurity());
-        System.out.println("Choose option");
-        System.out.println("1:Registration");
-        System.out.println("2:Authentication");
-        byte answ = sc.nextByte();
-        if (answ == 1){
-            System.out.println(protocols.registration());
-            System.exit(0);
-        } else if (answ == 2) {
-            boolean auth = protocols.authentication();
-            System.out.println(auth);
-            System.out.println("end of auth");
-            if(auth){
-                User user = new User();
-                NetworkChatManager manager = new NetworkChatManager(connection,user);
-                mainMenu(manager,sc,user);
-            }
-            else {
-                System.exit(0);
-            }
-
-        }else{
-            System.exit(0);
-        }
+    public static void main(String[] args) {
+        // Просто викликає метод launch з GuiClient
+        Application.launch(GuiClient.class, args);
     }
 
     private static void mainMenu(NetworkChatManager manager, Scanner sc, User me) {

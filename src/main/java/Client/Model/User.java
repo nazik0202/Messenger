@@ -40,6 +40,10 @@ public class User {
         return Objects.hash(userId, nickName, phoneNumber, profileDescription, localTimezone, onlineStatus, lastTimeOnline, tags, profilePhotoPath, pps, contactManager);
     }
 
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
     public int getUserId() {
         return userId;
     }

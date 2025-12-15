@@ -24,6 +24,10 @@ public class Message {
     public Message() {
     }
 
+    public void setSender(User sender) {
+        this.sender = sender;
+    }
+
     public void setStatus(MessageStatus status) {
         this.status = status;
     }
