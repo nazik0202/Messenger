@@ -71,28 +71,9 @@ public class GuiClient extends Application {
 
         // Логіка входу
         btnLogin.setOnAction(e -> {
-            // У вашому коді protocols.authentication() використовує Scanner всередині?
-            // Якщо так, його треба переписати, щоб він приймав логін/пароль аргументами.
-            // АЛЕ, припускаючи, що ви можете адаптувати логіку, або якщо protocols
-            // сам питає консоль - це проблема для GUI.
-            //
-            // ПРИПУЩЕННЯ: Ми трохи модифікуємо логіку тут для прикладу,
-            // оскільки я не бачу код ClientProtocols.
-            // Ми припускаємо, що протокол відправляє дані на сервер.
-
-            // *ВАЖЛИВО*: Тут має бути виклик вашої логіки аутентифікації.
-            // Оскільки я не можу змінити ваші класи, я емулюю виклик.
-            // В ідеалі protocols.auth(login, pass) має повертати true/false.
+            protocols.authentication(loginField.getText(),passField.getText());
 
             System.out.println("Sending auth request for: " + loginField.getText());
-
-            // Тимчасово для прикладу - викликаємо те, що є,
-            // але в реальності вам треба передати дані з полів GUI у ваші методи.
-            // Якщо protocols.authentication() жорстко використовує Scanner,
-            // вам доведеться створити перевантажений метод authentication(String login, String pass).
-
-            // *Для коректної роботи GUI вам потрібно додати метод у ClientProtocols,
-            // який приймає стрінги, а не читає консоль.*
 
             boolean authSuccess = performAuthHack(protocols, loginField.getText(), passField.getText());
 
@@ -110,8 +91,7 @@ public class GuiClient extends Application {
         });
 
         btnRegister.setOnAction(e -> {
-            // Аналогічно для реєстрації
-            showAlert("Info", "Реєстрацію через GUI треба адаптувати в ClientProtocols");
+            protocols.registration(loginField.getText(),passField.getText());
         });
 
         root.getChildren().addAll(label, loginField, passField, btnLogin, btnRegister);

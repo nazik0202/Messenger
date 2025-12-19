@@ -6,7 +6,7 @@ import Comon.Security.ServerConnection;
 import java.util.Scanner;
 
 public class ClientProtocols implements Protocols {
-    ServerConnection sc ;
+    ServerConnection sc;
     ClientSecurity cs;
     Scanner scanner;
 
@@ -24,7 +24,18 @@ public class ClientProtocols implements Protocols {
         String login = scanner.nextLine();
         sc.send(login);
         byte[] salt = sc.receive();
-        sc.send(cs.encrypt(salt,scanner.nextLine()));
+        sc.send(cs.encrypt(salt, scanner.nextLine()));
+        auth = sc.reciveBool();
+        return auth;
+    }
+
+    public boolean authentication(String login, String password) {
+        boolean auth = false;
+        sc.send("authentication");
+
+        sc.send(login);
+        byte[] salt = sc.receive();
+        sc.send(cs.encrypt(salt, password));
         auth = sc.reciveBool();
         return auth;
     }
@@ -56,11 +67,26 @@ public class ClientProtocols implements Protocols {
 //          6. сервер генерує та відправляє сіль
         byte[] salt = sc.receive();
 //          7. клієнт придумує пароль, шифрує і відправляє на сервер
-        byte[] password = cs.encrypt(salt,scanner.nextLine());
+        byte[] password = cs.encrypt(salt, scanner.nextLine());
         sc.send(password);
 //          8.сервер зберігає: логін, пароль, сіль
         boolean reg = sc.reciveBool();
 
+        return reg;
+    }
+
+    public boolean registration(String login, String passw) {
+        boolean loginValid = false;
+        sc.send("registration");
+        sc.send(login);
+        loginValid = sc.reciveBool();
+        if(!loginValid){
+            return false;
+        }
+        byte[] salt = sc.receive();
+        byte[] password = cs.encrypt(salt, passw);
+        sc.send(password);
+        boolean reg = sc.reciveBool();
         return reg;
     }
 }
