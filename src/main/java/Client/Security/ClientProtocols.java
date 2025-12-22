@@ -32,8 +32,12 @@ public class ClientProtocols implements Protocols {
     public boolean authentication(String login, String password) {
         boolean auth = false;
         sc.send("authentication");
-
         sc.send(login);
+        if(!sc.reciveBool()){
+            System.out.println("Server send false");
+            return false;
+        }
+
         byte[] salt = sc.receive();
         sc.send(cs.encrypt(salt, password));
         auth = sc.reciveBool();

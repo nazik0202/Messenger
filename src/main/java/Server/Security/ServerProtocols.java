@@ -37,26 +37,34 @@ public class ServerProtocols implements Protocols {
         String temp = sc.receiveStr();
         System.out.println("server is waiting for login");
         String login = sc.receiveStr();
-        sc.send(db.readSL(login));
-        System.out.println("server is waiting for pasword");
-        byte[] password = sc.receive();
-        byte[] pfdb = db.readPassword(login);
-        String passwordS =  Base64.getEncoder().encodeToString(password);
-        String pfdbS =  Base64.getEncoder().encodeToString(pfdb);
-        boolean auth = passwordS.equals(pfdbS);
-        sc.send(auth);
-        System.out.println(auth);
-        if(auth) {
-            int id;
-            try {
-                id = (int) db.read("users", List.of("id"), List.of("login"), List.of(login)).get(0).get("id");
-                sc.setAuthenticated(id);
+        try{
+            sc.send(db.readSL(login));
+            sc.send(true);
+            System.out.println("server is waiting for pasword");
+            byte[] password = sc.receive();
+            byte[] pfdb = db.readPassword(login);
+
+            String passwordS =  Base64.getEncoder().encodeToString(password);
+            String pfdbS =  Base64.getEncoder().encodeToString(pfdb);
+            boolean auth = passwordS.equals(pfdbS);
+            sc.send(auth);
+            System.out.println(auth);
+            if(auth) {
+                int id;
+                try {
+                    id = (int) db.read("users", List.of("id"), List.of("login"), List.of(login)).get(0).get("id");
+                    sc.setAuthenticated(id);
+                }
+                catch (SQLException e){
+                    System.out.println(e);
+                }
             }
-            catch (SQLException e){
-                System.out.println(e);
-            }
+            return auth;
+        }catch (NullPointerException e){
+            System.out.println("Login not found");
+            sc.send(false);
+            return false;
         }
-        return auth;
     }
 
     @Override
@@ -75,22 +83,23 @@ public class ServerProtocols implements Protocols {
         String login = "";
         boolean loginValid = false;
         String temp = sc.receiveStr();
-        while (!loginValid) {
-            System.out.println("server is waiting for login");
+        System.out.println("server is waiting for login");
 
 //          2. клієнт вводить логін та відправляє серверу
-            login = sc.receiveStr();
-            System.out.println("server received login:"+login);
+        login = sc.receiveStr();
+        System.out.println("server received login:"+login);
 //          3. сервер перевіряє чи нема що нема в бд запису с таким логіном
-            byte[] answ = db.readSL(login);
+        byte[] answ = db.readSL(login);
 
 //          4. сервер передає відповідь
-            if(answ == null){
-                loginValid = true;
-                System.out.println("login is valid");
-            }
+        if(answ == null){
+            loginValid = true;
+            System.out.println("login is valid");
+        }
 //          5. якщо є то клієнт переносится на крок 2 та видоми повідомлення
-            sc.send(loginValid);
+        sc.send(loginValid);
+        if(!loginValid){
+            return false;
         }
 
 //          6. сервер генерує та відправляє сіль

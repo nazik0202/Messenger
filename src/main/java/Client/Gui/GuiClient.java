@@ -69,6 +69,7 @@ public class GuiClient extends Application {
 
         ClientProtocols protocols = new ClientProtocols(connection, new ClientSecurity());
 
+
         // Логіка входу
         btnLogin.setOnAction(e -> {
             protocols.authentication(loginField.getText(),passField.getText());
@@ -87,6 +88,7 @@ public class GuiClient extends Application {
                 showChatListScene();
             } else {
                 showAlert("Помилка", "Невірний логін або пароль");
+                label.setText("Неправильні дані спробуйте ще раз");
             }
         });
 
