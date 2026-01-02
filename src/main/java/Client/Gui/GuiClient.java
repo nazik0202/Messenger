@@ -72,12 +72,9 @@ public class GuiClient extends Application {
 
         // Логіка входу
         btnLogin.setOnAction(e -> {
-            protocols.authentication(loginField.getText(),passField.getText());
+            boolean authSuccess = protocols.authentication(loginField.getText(),passField.getText());
 
             System.out.println("Sending auth request for: " + loginField.getText());
-
-            boolean authSuccess = performAuthHack(protocols, loginField.getText(), passField.getText());
-
             if (authSuccess) {
                 this.currentUser = new User();
                 // Важливо: зазвичай User заповнюється даними з сервера,
@@ -93,7 +90,13 @@ public class GuiClient extends Application {
         });
 
         btnRegister.setOnAction(e -> {
-            protocols.registration(loginField.getText(),passField.getText());
+            boolean regResult = protocols.registration(loginField.getText(),passField.getText());
+            if(regResult){
+                label.setText("Реєстрація успішна");
+            }else{
+                label.setText("Помилка реєстрації");
+            }
+
         });
 
         root.getChildren().addAll(label, loginField, passField, btnLogin, btnRegister);

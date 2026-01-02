@@ -38,10 +38,17 @@ public class ServerProtocols implements Protocols {
         System.out.println("server is waiting for login");
         String login = sc.receiveStr();
         try{
-            sc.send(db.readSL(login));
+            byte[] salt = db.readSL(login);
+            System.out.println("salt: "+salt);
+            if(salt == null){
+                sc.send(false);
+                return false;
+            }
             sc.send(true);
+            sc.send(salt);
             System.out.println("server is waiting for pasword");
             byte[] password = sc.receive();
+            System.out.println("Password: "+password);
             byte[] pfdb = db.readPassword(login);
 
             String passwordS =  Base64.getEncoder().encodeToString(password);

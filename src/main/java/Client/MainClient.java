@@ -15,7 +15,9 @@ import java.util.Base64;
 import java.util.List;
 import java.util.Scanner;//login:qwe password:1
                          //login:asd password:2
-
+                         //login:zxc password:3
+                         //login:rty password:4
+                         //login:fgh password:5
 
 public class MainClient {
 //    private static void startChatSession(WebSocketClientConnection connection, Scanner sc) {
