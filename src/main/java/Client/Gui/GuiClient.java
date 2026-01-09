@@ -31,6 +31,7 @@ public class GuiClient extends Application {
     private User currentUser;
     private Stage primaryStage;
     private Timeline messagePoller; // Для автооновлення чату
+    private Timeline chatPoller;
 
 
     @Override
@@ -133,6 +134,7 @@ public class GuiClient extends Application {
                 newChatUser.clear();
             }
         });
+
         createBox.getChildren().addAll(newChatUser, btnCreate);
 
         // Початкове завантаження
@@ -160,6 +162,12 @@ public class GuiClient extends Application {
         });
 
         root.getChildren().addAll(header, createBox, btnRefresh, chatListView);
+        chatPoller = new Timeline(new KeyFrame(Duration.seconds(5), event -> {
+            refreshChatList(chatListView);
+        }));
+        chatPoller.setCycleCount(Timeline.INDEFINITE);
+        chatPoller.play();
+
         primaryStage.setScene(new Scene(root, 400, 500));
     }
 
