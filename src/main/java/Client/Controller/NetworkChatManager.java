@@ -106,6 +106,13 @@ public class NetworkChatManager implements ChatManager {
         System.out.println("Server: " + response);
     }
 
+    public void sendReadStatus(Message msg){
+        String json = String.format("{\"type\": \"read_status\", \"payload\": {\"id\": %d, \"status\": \"read\"}}", msg.getId());
+        connection.send(json);
+        String response = connection.receiveStr();
+        System.out.println("Server: " + response);
+    }
+
     public void updateChatHistory(Chat chat, int offset) {
         String json = String.format("{\"type\": \"get_history\", \"payload\": {\"chat_id\": %d, \"offset\": %d}}", chat.getId(), offset);
         connection.send(json);

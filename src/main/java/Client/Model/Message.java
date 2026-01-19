@@ -14,6 +14,7 @@ public class Message {
     private User sender;
     private byte[] media;
     private boolean edit;
+    private int id;
 
     public Message(User sender, String text) {
         this.sender = sender;
@@ -90,5 +91,13 @@ public class Message {
     @Override
     public int hashCode() {
         return Objects.hash(status, sentTime, deliveredTime, text, sender, Arrays.hashCode(media), edit);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

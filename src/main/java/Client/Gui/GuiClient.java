@@ -8,6 +8,7 @@ import Client.Security.ClientProtocols;
 import Client.Security.ClientSecurity;
 import Client.Security.WebSocketClientConnection;
 
+import Client.util.MessageStatus;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.animation.KeyFrame;
@@ -164,7 +165,8 @@ public class GuiClient extends Application {
                         // Логіка СПОВІЩЕННЯ:
                         // Якщо останнє повідомлення НЕ від нас -> підсвічуємо
                         if (lastMsg.getSender() != null &&
-                                !lastMsg.getSender().getNickName().equals(currentUser.getNickName())) {
+                                !lastMsg.getSender().getNickName().equals(currentUser.getNickName()) &&
+                                lastMsg.getStatus() != MessageStatus.READ) {
                             displayText += " (NEW!)";
                             style = "-fx-font-weight: bold; -fx-text-fill: #000080;"; // Синій жирний текст
                         } else {
@@ -265,7 +267,7 @@ public class GuiClient extends Application {
                 // Sender встановлюється на сервері або в менеджері,
                 // але для локального об'єкта можемо вказати:
                 msg.setSender(currentUser);
-
+                msg.setStatus(MessageStatus.SENDING);
                 manager.sendMessage(msg, chat);
                 msgInput.clear();
 
@@ -310,11 +312,7 @@ public class GuiClient extends Application {
                     // (Вимагає імпорту: import Client.Model.MessageStatus;)
                     if (m.getStatus() != Client.util.MessageStatus.READ) {
                         m.setStatus(Client.util.MessageStatus.READ);
-
-                        // ВАЖЛИВО: Якщо сервер очікує підтвердження прочитання,
-                        // тут варто додати виклик менеджера, наприклад:
-                        // manager.sendReadStatus(m);
-                        //TODO: Зробити відправку на сервер
+                        manager.sendReadStatus(m);
                     }
                 }
                 // ---------------------------------
