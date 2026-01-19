@@ -106,22 +106,24 @@ public class GuiClient extends Application {
     }
 
     // --- ЕКРАН 2: Список чатів ---
+// --- ЕКРАН 2: Список чатів ---
     private void showChatListScene() {
-        if (messagePoller != null) messagePoller.stop(); // Зупинити оновлення повідомлень, якщо воно йшло
+        if (messagePoller != null) messagePoller.stop();
+        if (chatPoller != null) chatPoller.stop();
 
         VBox root = new VBox(10);
         root.setPadding(new Insets(10));
 
-        Label header = new Label("Мої чати");
+        Label header = new Label("Мої чати (Сповіщення активні)");
         header.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
 
         ListView<Chat> chatListView = new ListView<>();
 
-        // Кнопка оновити список чатів
+        // Кнопка оновити список (ручна)
         Button btnRefresh = new Button("Оновити список");
-        btnRefresh.setOnAction(e -> refreshChatList(chatListView));
+        btnRefresh.setOnAction(e -> refreshChatListWithHistory(chatListView));
 
-        // Кнопка створити новий чат
+        // Створення чату
         HBox createBox = new HBox(5);
         TextField newChatUser = new TextField();
         newChatUser.setPromptText("Логін користувача");
@@ -129,46 +131,98 @@ public class GuiClient extends Application {
         btnCreate.setOnAction(e -> {
             if (!newChatUser.getText().isEmpty()) {
                 manager.createChat(newChatUser.getText());
-                try { Thread.sleep(200); } catch (Exception ex){} // чекаємо відповіді сервера
-                refreshChatList(chatListView);
+                try { Thread.sleep(200); } catch (Exception ex){}
+                refreshChatListWithHistory(chatListView);
                 newChatUser.clear();
             }
         });
-
         createBox.getChildren().addAll(newChatUser, btnCreate);
 
-        // Початкове завантаження
-        refreshChatList(chatListView);
-
-        // Обробка кліку по чату
-        chatListView.setOnMouseClicked(e -> {
-            Chat selected = chatListView.getSelectionModel().getSelectedItem();
-            if (selected != null) {
-                showChatSessionScene(selected);
-            }
-        });
-
-        // Налаштування вигляду комірки списку
+        // --- ВІДОБРАЖЕННЯ (CellFactory) ---
+        // Тут ми налаштовуємо вигляд рядка, щоб бачити останнє повідомлення
         chatListView.setCellFactory(param -> new ListCell<>() {
             @Override
             protected void updateItem(Chat item, boolean empty) {
                 super.updateItem(item, empty);
                 if (empty || item == null) {
                     setText(null);
+                    setStyle("");
                 } else {
-                    setText(item.getName() + " [" + item.getType() + "]");
+                    // Формуємо текст: Назва чату
+                    String displayText = item.getName();
+                    String style = "";
+
+                    // Перевіряємо, чи є повідомлення
+                    if (item.getMessages() != null && !item.getMessages().isEmpty()) {
+                        // Беремо останнє
+                        Message lastMsg = item.getMessages().get(item.getMessages().size() - 1);
+                        String preview = lastMsg.getText();
+                        if (preview.length() > 15) preview = preview.substring(0, 15) + "...";
+
+                        displayText += " : " + preview;
+
+                        // Логіка СПОВІЩЕННЯ:
+                        // Якщо останнє повідомлення НЕ від нас -> підсвічуємо
+                        if (lastMsg.getSender() != null &&
+                                !lastMsg.getSender().getNickName().equals(currentUser.getNickName())) {
+                            displayText += " (NEW!)";
+                            style = "-fx-font-weight: bold; -fx-text-fill: #000080;"; // Синій жирний текст
+                        } else {
+                            style = "-fx-text-fill: grey;"; // Звичайний сірий для своїх повідомлень
+                        }
+                    }
+
+                    setText(displayText);
+                    setStyle(style);
                 }
             }
         });
 
+        // Клік по чату
+        chatListView.setOnMouseClicked(e -> {
+            Chat selected = chatListView.getSelectionModel().getSelectedItem();
+            if (selected != null) {
+                if (chatPoller != null) chatPoller.stop();
+                showChatSessionScene(selected);
+            }
+        });
+
         root.getChildren().addAll(header, createBox, btnRefresh, chatListView);
-        chatPoller = new Timeline(new KeyFrame(Duration.seconds(5), event -> {
-            refreshChatList(chatListView);
+
+        // --- АВТОМАТИЧНЕ ОНОВЛЕННЯ ІСТОРІЇ У ВСІХ ЧАТАХ ---
+        chatPoller = new Timeline(new KeyFrame(Duration.seconds(3), event -> {
+            refreshChatListWithHistory(chatListView);
         }));
         chatPoller.setCycleCount(Timeline.INDEFINITE);
         chatPoller.play();
 
+        // Перше завантаження
+        refreshChatListWithHistory(chatListView);
+
         primaryStage.setScene(new Scene(root, 400, 500));
+    }
+
+    // Допоміжний метод для оновлення і списку, і історії
+    private void refreshChatListWithHistory(ListView<Chat> listView) {
+        // 1. Отримуємо список чатів
+        List<Chat> chats = manager.fetchChats();
+
+        // 2. Проходимо по кожному чату і підтягуємо історію
+        for (Chat c : chats) {
+            try {
+                // Завантажуємо повідомлення для конкретного чату
+                manager.updateChatHistory(c, 0);
+            } catch (Exception e) {
+                System.out.println("Error updating history for chat: " + c.getName());
+            }
+        }
+
+        // 3. Оновлюємо UI (запам'ятовуємо вибір, щоб не скакало)
+        int selectedIndex = listView.getSelectionModel().getSelectedIndex();
+        listView.setItems(FXCollections.observableArrayList(chats));
+        if (selectedIndex >= 0 && selectedIndex < chats.size()) {
+            listView.getSelectionModel().select(selectedIndex);
+        }
     }
 
     private void refreshChatList(ListView<Chat> listView) {
@@ -239,22 +293,54 @@ public class GuiClient extends Application {
     }
 
     private void updateMessages(Chat chat, ListView<String> view) {
-        // Логіка оновлення з MainClient
+        // 1. Оновлюємо історію з сервера (як було)
         manager.updateChatHistory(chat, 0);
 
         ObservableList<String> items = FXCollections.observableArrayList();
+
         if (chat.getMessages() != null) {
             for (Message m : chat.getMessages()) {
+
+                // --- ЛОГІКА ПРОЧИТАННЯ (НОВЕ) ---
+                // Якщо повідомлення ВІД ІНШОГО користувача і статус ще не READ
+                if (m.getSender() != null &&
+                        !m.getSender().getNickName().equals(currentUser.getNickName())) {
+
+                    // Перевіряємо поточний статус, щоб не ставити його зайвий раз
+                    // (Вимагає імпорту: import Client.Model.MessageStatus;)
+                    if (m.getStatus() != Client.util.MessageStatus.READ) {
+                        m.setStatus(Client.util.MessageStatus.READ);
+
+                        // ВАЖЛИВО: Якщо сервер очікує підтвердження прочитання,
+                        // тут варто додати виклик менеджера, наприклад:
+                        // manager.sendReadStatus(m);
+                        //TODO: Зробити відправку на сервер
+                    }
+                }
+                // ---------------------------------
+
+                // Форматування рядка для відображення
                 String time = (m.getSentTime() != null) ? m.getSentTime().toLocalTime().toString() : "..";
                 String sender = (m.getSender() != null) ? m.getSender().getNickName() : "Unknown";
-                items.add(String.format("[%s] %s: %s", time, sender, m.getText()));
+
+                // Можна додати візуальну позначку для своїх повідомлень (прочитано/ні)
+                String statusMarker = "";
+                if (m.getSender().getNickName().equals(currentUser.getNickName())) {
+                    statusMarker = (m.getStatus() == Client.util.MessageStatus.READ) ? " (R)" : " (U)";
+                }
+
+                items.add(String.format("[%s] %s: %s%s", time, sender, m.getText(), statusMarker));
             }
         }
 
-        // Оновлюємо список тільки якщо щось змінилось (проста перевірка)
+        // Оновлюємо UI, тільки якщо кількість повідомлень змінилась
+        // (Або можна прибрати умову if, якщо хочете бачити зміну статусу (R)/(U) в реальному часі)
         if (view.getItems().size() != items.size()) {
             view.setItems(items);
             view.scrollTo(items.size() - 1); // Прокрутка вниз
+        } else {
+            // Якщо кількість та сама, але статуси могли змінитись - можна просто оновити список:
+            // view.setItems(items);
         }
     }
 

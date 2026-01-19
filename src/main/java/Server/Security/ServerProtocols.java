@@ -50,7 +50,6 @@ public class ServerProtocols implements Protocols {
             byte[] password = sc.receive();
             System.out.println("Password: "+password);
             byte[] pfdb = db.readPassword(login);
-
             String passwordS =  Base64.getEncoder().encodeToString(password);
             String pfdbS =  Base64.getEncoder().encodeToString(pfdb);
             boolean auth = passwordS.equals(pfdbS);
