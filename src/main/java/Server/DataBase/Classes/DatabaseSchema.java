@@ -74,7 +74,7 @@ public class DatabaseSchema {
                         new Column("content", "BLOB NOT NULL"),
                         new Column("send_time", "DATETIME DEFAULT CURRENT_TIMESTAMP"),
                         new Column("deliver_time", "DATETIME"),
-                        new Column("status", "TEXT DEFAULT 'DELIVERED_SERVER'"),
+                        new Column("status", "TEXT DEFAULT 'READ'"),
                         new Column("edit","BOOL DEFAULT 0"),
                         new Column("num_in_chat", "INTEGER")
                         ),

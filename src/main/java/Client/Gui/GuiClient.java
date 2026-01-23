@@ -167,6 +167,7 @@ public class GuiClient extends Application {
                         if (lastMsg.getSender() != null &&
                                 !lastMsg.getSender().getNickName().equals(currentUser.getNickName()) &&
                                 lastMsg.getStatus() != MessageStatus.READ) {
+                            System.out.println(lastMsg.getStatus());
                             displayText += " (NEW!)";
                             style = "-fx-font-weight: bold; -fx-text-fill: #000080;"; // Синій жирний текст
                         } else {
@@ -312,7 +313,7 @@ public class GuiClient extends Application {
                     // (Вимагає імпорту: import Client.Model.MessageStatus;)
                     if (m.getStatus() != Client.util.MessageStatus.READ) {
                         m.setStatus(Client.util.MessageStatus.READ);
-                        manager.sendReadStatus(m);
+//                        manager.sendReadStatus(m);
                     }
                 }
                 // ---------------------------------
