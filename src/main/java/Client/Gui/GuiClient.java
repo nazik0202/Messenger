@@ -34,6 +34,12 @@ public class GuiClient extends Application {
     private Timeline messagePoller; // Для автооновлення чату
     private Timeline chatPoller;
 
+    private String fieldStyle = "-fx-background-color: #2b2b4f; -fx-text-fill: white; -fx-prompt-text-fill: #aaaaaa; -fx-border-color: #4b4b8b;";
+    private String buttonStyle = "-fx-background-color: #4682B4; -fx-text-fill: white; -fx-font-weight: bold; -fx-cursor: hand;";
+    private String backgroundStyle = "-fx-background-color: #222222; -fx-alignment: center;";
+    private String labelStyle = "-fx-text-fill: white;";
+    private String boldLabelStyle = "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;";
+
 
     @Override
     public void start(Stage stage) {
@@ -58,16 +64,24 @@ public class GuiClient extends Application {
     private void showLoginScene() {
         VBox root = new VBox(10);
         root.setPadding(new Insets(20));
-        root.setStyle("-fx-alignment: center;");
+        root.setStyle(backgroundStyle);
 
         Label label = new Label("Вітаємо! Увійдіть або зареєструйтесь");
+        label.setStyle(labelStyle);
+
         TextField loginField = new TextField();
         loginField.setPromptText("Логін");
+        loginField.setStyle(fieldStyle);
+
         PasswordField passField = new PasswordField();
         passField.setPromptText("Пароль");
+        passField.setStyle(fieldStyle);
 
         Button btnLogin = new Button("Увійти (Auth)");
+        btnLogin.setStyle(buttonStyle);
+
         Button btnRegister = new Button("Реєстрація");
+        btnRegister.setStyle(buttonStyle);
 
         ClientProtocols protocols = new ClientProtocols(connection, new ClientSecurity());
 
@@ -114,21 +128,26 @@ public class GuiClient extends Application {
 
         VBox root = new VBox(10);
         root.setPadding(new Insets(10));
+        root.setStyle(backgroundStyle);
 
         Label header = new Label("Мої чати (Сповіщення активні)");
-        header.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
+        header.setStyle(boldLabelStyle);
 
         ListView<Chat> chatListView = new ListView<>();
 
         // Кнопка оновити список (ручна)
         Button btnRefresh = new Button("Оновити список");
+        btnRefresh.setStyle(buttonStyle);
         btnRefresh.setOnAction(e -> refreshChatListWithHistory(chatListView));
 
         // Створення чату
         HBox createBox = new HBox(5);
+        createBox.setStyle(backgroundStyle);
         TextField newChatUser = new TextField();
+        newChatUser.setStyle(fieldStyle);
         newChatUser.setPromptText("Логін користувача");
         Button btnCreate = new Button("Створити чат");
+        btnCreate.setStyle(buttonStyle);
         btnCreate.setOnAction(e -> {
             if (!newChatUser.getText().isEmpty()) {
                 manager.createChat(newChatUser.getText());
@@ -180,7 +199,7 @@ public class GuiClient extends Application {
                 }
             }
         });
-
+        chatListView.setStyle(backgroundStyle + "-fx-control-inner-background: #222222;");
         // Клік по чату
         chatListView.setOnMouseClicked(e -> {
             Chat selected = chatListView.getSelectionModel().getSelectedItem();
@@ -238,22 +257,27 @@ public class GuiClient extends Application {
     private void showChatSessionScene(Chat chat) {
         VBox root = new VBox(10);
         root.setPadding(new Insets(10));
+        root.setStyle(backgroundStyle);
 
         HBox topBar = new HBox(10);
         Button btnBack = new Button("<- Назад");
+        btnBack.setStyle(buttonStyle);
         btnBack.setOnAction(e -> showChatListScene());
         Label chatName = new Label("Чат: " + chat.getName());
-        chatName.setStyle("-fx-font-weight: bold;");
+        chatName.setStyle(boldLabelStyle);
         topBar.getChildren().addAll(btnBack, chatName);
 
         // Область повідомлень
         ListView<String> messagesView = new ListView<>();
+        messagesView.setStyle(backgroundStyle + "-fx-control-inner-background: #222222;");
 
         // Область вводу
         HBox inputBox = new HBox(5);
         TextField msgInput = new TextField();
+        msgInput.setStyle(fieldStyle);
         HBox.setHgrow(msgInput, Priority.ALWAYS);
         Button btnSend = new Button("Надіслати");
+        btnSend.setStyle(buttonStyle);
 
         // Логіка відправки
         btnSend.setOnAction(e -> {
