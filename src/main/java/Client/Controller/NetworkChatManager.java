@@ -134,7 +134,7 @@ public class NetworkChatManager implements ChatManager {
 
                 // Map JSON to Message
                 Message msg = new Message(sender, msgObj.getString("content"));
-
+                msg.setId(msgObj.getInt("id"));
                 // Parse timestamp (Simple approach, assuming server sends readable format)
                 try {
                     String timeStr = msgObj.getString("timestamp");
@@ -161,8 +161,10 @@ public class NetworkChatManager implements ChatManager {
     private MessageStatus mapStatus(String status) {
         return switch (status) {
             case "read" -> MessageStatus.READ;
-            case "delivered" -> MessageStatus.DELIVERED_SERVER;
+            case "delivered_server" -> MessageStatus.DELIVERED_SERVER;
             default -> MessageStatus.SENDING;
         };
     }
+
+
 }

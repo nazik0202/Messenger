@@ -313,7 +313,7 @@ public class GuiClient extends Application {
                     // (Вимагає імпорту: import Client.Model.MessageStatus;)
                     if (m.getStatus() != Client.util.MessageStatus.READ) {
                         m.setStatus(Client.util.MessageStatus.READ);
-//                        manager.sendReadStatus(m);
+                        manager.sendReadStatus(m);
                     }
                 }
                 // ---------------------------------
@@ -339,7 +339,7 @@ public class GuiClient extends Application {
             view.scrollTo(items.size() - 1); // Прокрутка вниз
         } else {
             // Якщо кількість та сама, але статуси могли змінитись - можна просто оновити список:
-            // view.setItems(items);
+             view.setItems(items);
         }
     }
 

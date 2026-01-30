@@ -41,7 +41,10 @@ public class AsyncChatHandler {
                 case "send_message":
                     handleSendMessage(json, connection);
                     break;
-                default:
+                case "read_status":
+                    handleUpdateStatus(json, connection);
+                    break;
+                    default:
                     System.out.println("Unknown command: " + type);
 
             }
@@ -98,6 +101,15 @@ public class AsyncChatHandler {
         response.put("chat_id", chatId);
         response.put("payload", messages);
         connection.send(response.toString());
+    }
+    private void handleUpdateStatus(JSONObject json,WebSocketServerConnection connection){
+        int msgId = json.getJSONObject("payload").getInt("id");
+        try {
+            chatDB.edit("messages", List.of("status"),List.of("read"),List.of("id"),List.of(msgId));
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        connection.send("Operation successful");
     }
 }
 
