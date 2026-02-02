@@ -1,0 +1,17 @@
+/* Бульбашка відправника (справа, синя) */
+.sent-bubble {
+    -fx-background-color: #0078FF;
+    -fx-background-radius: 15px 15px 0px 15px; /* Хвостик справа знизу */
+    -fx-text-fill: white;
+    -fx-padding: 8px 12px;
+    -fx-font-size: 14px;
+}
+
+/* Бульбашка отримувача (зліва, сіра) */
+.received-bubble {
+    -fx-background-color: #E5E5EA;
+    -fx-background-radius: 15px 15px 15px 0px; /* Хвостик зліва знизу */
+    -fx-text-fill: black;
+    -fx-padding: 8px 12px;
+    -fx-font-size: 14px;
+}

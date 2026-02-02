@@ -16,6 +16,7 @@ import javafx.animation.Timeline;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
@@ -114,9 +115,13 @@ public class GuiClient extends Application {
             }
 
         });
-
+        Scene scene = new Scene(root, 300, 250);
+        var resource = getClass().getResource("/styles.css");
+        if (resource != null) {
+            scene.getStylesheets().add(resource.toExternalForm());
+        }
         root.getChildren().addAll(label, loginField, passField, btnLogin, btnRegister);
-        primaryStage.setScene(new Scene(root, 300, 250));
+        primaryStage.setScene(scene);
         primaryStage.show();
     }
 
@@ -268,8 +273,51 @@ public class GuiClient extends Application {
         topBar.getChildren().addAll(btnBack, chatName);
 
         // Область повідомлень
-        ListView<String> messagesView = new ListView<>();
-        messagesView.setStyle(backgroundStyle + "-fx-control-inner-background: #222222;");
+        ListView<Message> messagesView = new ListView<>();
+        messagesView.setCellFactory(param -> new ListCell<>() {
+            @Override
+            protected void updateItem(Message msg, boolean empty) {
+                super.updateItem(msg, empty);
+
+                if (empty || msg == null) {
+                    setGraphic(null);
+                    setText(null);
+                    setStyle("-fx-background-color: transparent;");
+                } else {
+                    // Container
+                    HBox root = new HBox();
+
+                    // Bubble
+                    Label msgLabel = new Label(msg.getText());
+                    msgLabel.setWrapText(true);
+                    msgLabel.setMaxWidth(250); // Limit width
+
+                    boolean isMine = msg.getSender().getNickName().equals(currentUser.getNickName());
+
+                    if (isMine) {
+                        root.setAlignment(Pos.CENTER_RIGHT);
+                        msgLabel.getStyleClass().add("sent-bubble");
+                        // Status indicator
+                        Label statusLabel = new Label(msg.getStatus() == MessageStatus.READ ? "✓✓" : "✓");
+                        statusLabel.getStyleClass().add("timestamp");
+                        VBox vBox = new VBox(msgLabel, statusLabel);
+                        vBox.setAlignment(Pos.BOTTOM_RIGHT);
+                        root.getChildren().add(vBox);
+                    } else {
+                        root.setAlignment(Pos.CENTER_LEFT);
+                        msgLabel.getStyleClass().add("received-bubble");
+                        Label senderName = new Label(msg.getSender().getNickName());
+                        senderName.setStyle("-fx-font-size: 10px; -fx-text-fill: grey;");
+                        VBox vBox = new VBox(senderName, msgLabel);
+                        vBox.setAlignment(Pos.BOTTOM_LEFT);
+                        root.getChildren().add(vBox);
+                    }
+
+                    setGraphic(root);
+                    setText(null);
+                }
+            }
+        });
 
         // Область вводу
         HBox inputBox = new HBox(5);
@@ -319,14 +367,14 @@ public class GuiClient extends Application {
         primaryStage.setScene(new Scene(root, 500, 600));
     }
 
-    private void updateMessages(Chat chat, ListView<String> view) {
+    private void updateMessages(Chat chat, ListView<Message> view) {
         // 1. Оновлюємо історію з сервера (як було)
         manager.updateChatHistory(chat, 0);
 
-        ObservableList<String> items = FXCollections.observableArrayList();
+        ObservableList<Message> items = FXCollections.observableArrayList(chat.getMessages());
 
         if (chat.getMessages() != null) {
-            for (Message m : chat.getMessages()) {
+            for (Message m : items) {
 
                 // --- ЛОГІКА ПРОЧИТАННЯ (НОВЕ) ---
                 // Якщо повідомлення ВІД ІНШОГО користувача і статус ще не READ
@@ -352,7 +400,7 @@ public class GuiClient extends Application {
                     statusMarker = (m.getStatus() == Client.util.MessageStatus.READ) ? " (R)" : " (U)";
                 }
 
-                items.add(String.format("[%s] %s: %s%s", time, sender, m.getText(), statusMarker));
+//                items.add(String.format("[%s] %s: %s%s", time, sender, m.getText(), statusMarker));
             }
         }
 
