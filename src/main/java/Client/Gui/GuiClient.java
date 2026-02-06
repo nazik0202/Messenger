@@ -41,6 +41,19 @@ public class GuiClient extends Application {
     private String labelStyle = "-fx-text-fill: white;";
     private String boldLabelStyle = "-fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 14px;";
 
+    private String sentBubbleStyles = "    -fx-background-color: #0078FF;\n" +
+            "    -fx-background-radius: 15px 15px 0px 15px; /* Хвостик справа знизу */\n" +
+            "    -fx-text-fill: white;\n" +
+            "    -fx-padding: 8px 12px;\n" +
+            "    -fx-font-size: 14px;";
+    private String receivedBubbleStyles =
+            "    -fx-background-color: #E5E5EA;\n" +
+                    "    -fx-background-radius: 15px 15px 15px 0px; /* Хвостик зліва знизу */\n" +
+                    "    -fx-text-fill: black;\n" +
+                    "    -fx-padding: 8px 12px;\n" +
+                    "    -fx-font-size: 14px;";
+
+
 
     @Override
     public void start(Stage stage) {
@@ -116,8 +129,9 @@ public class GuiClient extends Application {
 
         });
         Scene scene = new Scene(root, 300, 250);
-        var resource = getClass().getResource("/styles.css");
+        var resource = getClass().getResource("/style.css");
         if (resource != null) {
+            System.out.println("ERROR, file style.css not found");
             scene.getStylesheets().add(resource.toExternalForm());
         }
         root.getChildren().addAll(label, loginField, passField, btnLogin, btnRegister);
@@ -282,7 +296,7 @@ public class GuiClient extends Application {
                 if (empty || msg == null) {
                     setGraphic(null);
                     setText(null);
-                    setStyle("-fx-background-color: transparent;");
+                    setStyle(backgroundStyle);
                 } else {
                     // Container
                     HBox root = new HBox();
@@ -297,6 +311,7 @@ public class GuiClient extends Application {
                     if (isMine) {
                         root.setAlignment(Pos.CENTER_RIGHT);
                         msgLabel.getStyleClass().add("sent-bubble");
+                        msgLabel.setStyle(sentBubbleStyles);
                         // Status indicator
                         Label statusLabel = new Label(msg.getStatus() == MessageStatus.READ ? "✓✓" : "✓");
                         statusLabel.getStyleClass().add("timestamp");
@@ -306,6 +321,8 @@ public class GuiClient extends Application {
                     } else {
                         root.setAlignment(Pos.CENTER_LEFT);
                         msgLabel.getStyleClass().add("received-bubble");
+                        msgLabel.setStyle(receivedBubbleStyles);
+
                         Label senderName = new Label(msg.getSender().getNickName());
                         senderName.setStyle("-fx-font-size: 10px; -fx-text-fill: grey;");
                         VBox vBox = new VBox(senderName, msgLabel);
@@ -339,8 +356,7 @@ public class GuiClient extends Application {
                 msg.setText(text);
                 // Sender встановлюється на сервері або в менеджері,
                 // але для локального об'єкта можемо вказати:
-                msg.setSender(currentUser);
-                msg.setStatus(MessageStatus.SENDING);
+                msg.setSender(currentUser);msg.setStatus(MessageStatus.SENDING);
                 manager.sendMessage(msg, chat);
                 msgInput.clear();
 
